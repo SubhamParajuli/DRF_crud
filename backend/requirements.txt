@@ -1,2 +1,7 @@
-django 
+Django
 djangorestframework
+django-cors-headers
+dj-database-url
+gunicorn
+psycopg2-binary
+whitenoise
