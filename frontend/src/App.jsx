@@ -1,34 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState , useEffect} from 'react'
+import StudentForm from './components/StudentForm'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [student,setStudent]=useState(()=>{
+    const saved= localStorage.getItem('student');
+    return saved? JSON.parse(saved) : [];
+  });
 
+  useEffect(()=>{
+    localStorage.setItem("student",JSON.stringify(student))
+  },[student])
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-stone-50 px-4 py-12 text-stone-900">
+      <div className="mx-auto w-full max-w-2xl">
+        <header className="mb-8 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">Todo List</h1>
+          <p className="mt-2 text-sm text-stone-600">Edit, update, and keep things tidy.</p>
+        </header>
+        <StudentForm students={student} setStudent={setStudent}/>
+        <ToastContainer position="top-right" autoClose={2000} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
