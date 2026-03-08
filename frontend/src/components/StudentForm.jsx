@@ -1,31 +1,32 @@
-import React from 'react'
 import { useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import StudentList from './StudentList';
 import { toast } from 'react-toastify';
 
-const StudentForm = ({students,setStudent}) => {
+const StudentForm = ({ students, createTask, updateTask, deleteTask, isLoading }) => {
 
-    const [name,setName]=useState("");
+    const [name, setName] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-    const handleSubmit=(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (name.trim().length === 0){
+        if (name.trim().length === 0) {
             toast.error("Name must be filled");
             return;
         }
 
-        const newStudent={
-            id: Date.now(),
-            name: name.trim(),
-            completed: false,
+        try {
+            setIsSubmitting(true);
+            await createTask(name.trim());
+            toast.success("Task added successfully");
+            setName("");
+        } catch (error) {
+            toast.error(error.message || "Unable to add task");
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setStudent([...students,newStudent])
-        toast.success("Task added successfully")
-        setName("");
     }
     
     return (
@@ -36,11 +37,12 @@ const StudentForm = ({students,setStudent}) => {
                     value={name}
                     onChange={(e)=> setName(e.target.value)}
                     placeholder='Enter task'
+                    disabled={isSubmitting}
                     className='w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400/40'
                     />
-                    <button type='submit' className='inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-950 sm:w-auto'>
+                    <button type='submit' disabled={isSubmitting} className='inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto'>
                         <FiPlus className="text-base" aria-hidden="true" />
-                        Add
+                        {isSubmitting ? 'Add' : 'Add'}
                     </button>
             </form>
             <div className="mt-6">
@@ -48,7 +50,7 @@ const StudentForm = ({students,setStudent}) => {
                     <span>Tasks</span>
                     <span>{students.length} total</span>
                 </div>
-                <StudentList key={students.id} students={students} setStudent={setStudent}/>
+                <StudentList students={students} updateTask={updateTask} deleteTask={deleteTask} isLoading={isLoading} />
             </div>
         </div>
     )

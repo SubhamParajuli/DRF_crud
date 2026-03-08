@@ -1,78 +1,31 @@
-from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .models import Task
 from .serializers import TaskSerializer
 
 
 
-@api_view()
+@api_view(["GET"])
 def get_task(request):
-    queryset=Task.objects.all()
-    serializer=TaskSerializer(queryset,many=True)
+    # Backward-compatible list endpoint.
+    queryset = Task.objects.all().order_by("-pk")
+    serializer = TaskSerializer(queryset, many=True)
 
     return Response({
-        "data":serializer.data,
+        "data": serializer.data,
     })
 
 
-
-class TaskApi(APIView):
-    def get(self,request):
-        queryset=Task.objects.all().order_by("-pk")
-        serializer=TaskSerializer(queryset,many=True)
-
-        return Response({
-            "data": serializer.data
-        })
-
-    def post(self,request):
-        data= request.data
-        serializer=TaskSerializer(data=data)
-
-        if not serializer.is_valid():
-            return Response({
-                "message": "data not saved.",
-                "errors": serializer.errors,
-            })
-        serializer.save()
-        return Response({
-            "message": "Data saved successfully."
-        })
-
-    def patch(self,request):
-        data=request.data
-
-        if not data.get('id'):
-            return Response({
-                "message": "data not updated",
-                "errors": "id not found"
-            })
-        
-        task= Task.objects.get(id=data.get('id'))
-        serializer=TaskSerializer(task, data=data, partial=True)
-        if not serializer.is_valid():
-            return Response({
-                "message": "data not updated",
-                "errors": serializer.errors,
-            })
-        serializer.save()
-        return Response({
-            "message": "Data updated successfully."
-        })
+class TaskListCreateApi(ListCreateAPIView):
+    queryset = Task.objects.all().order_by("-pk")
+    serializer_class = TaskSerializer
+    permission_classes = [AllowAny]
 
 
-    def delete(self,request):
-        data=request.data
-        if not data.get('id'):
-            return Response({
-                "message": "data not updated",
-                "errors": "id not found"
-            })
-        
-        task= Task.objects.get(id=data.get('id')).delete()
-        return Response({
-            "message": "Data deleted successfully."
-        })
+class TaskRetrieveUpdateDeleteApi(RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [AllowAny]
