@@ -3,8 +3,8 @@ import StudentForm from './components/StudentForm'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api'
-const TASKS_URL = `${API_BASE}/tasks/`
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'https://drf-crud-y18n.onrender.com').replace(/\/$/, '')
+const TASKS_URL = `${API_BASE}/api/tasks/`
 
 function App() {
   const [student, setStudent] = useState([])
