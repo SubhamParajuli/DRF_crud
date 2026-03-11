@@ -13,7 +13,7 @@ const StudentForm = ({ students, createTask, updateTask, deleteTask, isLoading }
         e.preventDefault();
 
         if (name.trim().length === 0) {
-            toast.error("Name must be filled");
+            toast.error("Text must be filled");
             return;
         }
 
